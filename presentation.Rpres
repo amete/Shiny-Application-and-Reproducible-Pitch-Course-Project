@@ -1,0 +1,123 @@
+Course Project: Shiny Application and Reproducible Pitch
+========================================================
+author: Alaettin Serhan Mete
+date: 11/20/2017
+autosize: true
+
+Introduction
+========================================================
+
+This presentation is prepared for the Coursera Data Products peer-graded assignment titled
+"Course Project: Shiny Application and Reproducible Pitch".
+
+The relevant material can be found at:
+
+- ShinyApps page: <http://amete.shinyapps.io/Shiny-Application-and-Reproducible-Pitch-Course-Project> 
+- GitHug page: <http://github.com/amete/Shiny-Application-and-Reproducible-Pitch-Course-Project>
+
+The first page contains the Shiny application and the second contains the source code.
+
+We will summarize the usage in the next few slides.
+
+Interactive Plotting and Linear Regression - I
+========================================================
+
+This Shiny application performs the following main tasks:
+
+- Produce a 2-dimensional plot based on the user input,
+- Perform linear regression in the simple for of (y~x) based on the input variables,
+- For a test value of x, it gives the predicted y value.
+
+The user can select the x/y-variables to be plotted from two dropdown menus. There are four available variables:
+
+- Miles/(US) Gallon
+- Number of cylinders
+- Gross horsepower
+- Weight (1000 lbs)
+
+The user can also select (from the same set of variables) the coloring of the scatter plot.
+
+(cont'd on the next page)
+
+Interactive Plotting and Linear Regression - II
+========================================================
+
+Behind the scenes, the server side builds a linear model based on the user input.
+
+The user can provide a numeric input (input value for the fit) for which the predicted y-value given the model is computed.
+
+Then this information (input/output) is printed/plotted on the figure, including the final model.
+
+The user can choose not to display the information explained in the last part using the last input on the left sidebar.
+
+The data used in this project is the Motor Trend Car Road Tests dataset that is provided in R:
+
+```{r}
+print(head(mtcars))
+```
+
+A Sample Output from the Application - I
+========================================================
+
+By default the miles per gallon (mpg) is plotted as a function of weight (wt) in 1000 lbs:
+
+```{r, echo=FALSE, fig.width=16, fig.height=8, fig.align="center"}
+require(dplyr)
+require(ggplot2)
+dataset_x <- select(mtcars,c("wt"))
+names(dataset_x) <- "xvar"
+dataset_y <- select(mtcars,c("mpg"))
+names(dataset_y) <- "yvar"
+dataset_c <- select(mtcars,c("cyl"))
+names(dataset_c) <- "color"
+dataset <- cbind(dataset_x,dataset_y,dataset_c)
+my_fit <- lm(yvar~xvar, data = dataset)
+my_point <- data.frame(x = c(2.5))
+colnames(my_point) <- "xvar"
+my_point <- mutate(my_point, yvar=predict(my_fit,my_point))
+p <- ggplot(data = dataset, aes(x = xvar, y = yvar, color=color))
+p <- p + geom_point(size = 4, show.legend = TRUE)
+p <- p + geom_point(colour = "white", size = 1.5, show.legend = TRUE)
+p <- p + scale_x_continuous(limits = c(0,7))
+p <- p + scale_y_continuous(limits = c(0,40))
+p <- p + scale_color_gradientn(name = toupper("cyl"),colours = rainbow(3))
+p <- p + labs( title  = "2-D Histogram",
+               x = toupper("wt"),
+               y = toupper("mpg"))
+p <- p + theme_bw(base_size = 15)
+p <- p + theme(plot.title = element_text(hjust = 0.5))
+p <- p + geom_smooth(method='lm',formula=y~x)
+p <- p + geom_point(aes(x = my_point$xvar, y = my_point$yvar),
+                    shape = 18, size=5, colour = "black")
+p <- p + annotate("text",
+                  label = paste("Fit input  (x): ",format(round(my_point$xvar, 2), nsmall = 2)),
+                  x = 0.60*7, 
+                  y = 0.97*40,
+                  size = 7,
+                  hjust = 0)
+p <- p + annotate("text",
+                  label = paste("Fit result (y): ",format(round(my_point$yvar, 2), nsmall = 2)),
+                  x = 0.60*7, 
+                  y = 0.85*40,
+                  size = 7,
+                  hjust = 0)
+print(p)
+```
+
+(cont'd on the next page)
+
+A Sample Output from the Application - II
+========================================================
+
+<br>
+
+For a 2500 lbs car (input), the model predicts the mpg to be approximately 24.
+
+This information is printed on the figure and a black diamond is overlaid on the plot showing the coordinates.
+
+The user can choose to avoid having this information shown on the figure by selectinf "No" for the last input on the left column.
+
+<br>
+
+<strong>I hope you enjoyed this simple application, please let me know your comments/questions!</strong>
+
