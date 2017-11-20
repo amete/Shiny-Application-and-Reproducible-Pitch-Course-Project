@@ -59,7 +59,7 @@ shinyServer(function(input, output) {
     if(input$plotfit) {
         p <- p + geom_smooth(method='lm',formula=y~x)
         p <- p + geom_point(aes(x = my_point$xvar, y = my_point$yvar),
-                            shape = 18, size=4, colour = "black")
+                            shape = 18, size=5, colour = "black")
         p <- p + annotate("text",
                           label = paste("Fit input  (x): ",format(round(my_point$xvar, 2), nsmall = 2)),
                           x = 0.60*input$xrange[2], 
